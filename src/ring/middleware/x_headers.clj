@@ -1,4 +1,4 @@
-(ns ring.middleware.headers)
+(ns ring.middleware.x-headers)
 
 (defn foo
   "I don't do a whole lot."

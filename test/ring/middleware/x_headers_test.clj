@@ -1,6 +1,6 @@
-(ns ring.middleware.headers-test
+(ns ring.middleware.x-headers-test
   (:use clojure.test
-        ring.middleware.headers))
+        ring.middleware.x-headers))
 
 (deftest a-test
   (testing "FIXME, I fail."
