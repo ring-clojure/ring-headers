@@ -1,4 +1,5 @@
 (ns ring.middleware.absolute-redirects
+  "Middleware for correcting relative redirects so they adhere to the HTTP RFC."
   (:require [ring.util.request :as req])
   (:import  [java.net URL MalformedURLException]))
 
@@ -26,6 +27,10 @@
       (str (URL. url location)))))
 
 (defn wrap-absolute-redirects
+  "Middleware that converts redirects to relative URLs into redirects to
+  absolute URLs. While many browsers can handle relative URLs in the Location
+  header, the HTTP RFC states that the Location header must contain an absolute
+  URL."
   [handler]
   (fn [request]
     (let [response (handler request)]
