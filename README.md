@@ -8,7 +8,7 @@ Ring middleware for adding and manipulating common response headers.
 
 Add the following dependency to your `project.clj`:
 
-    [ring/ring-headers "0.1.0-SNAPSHOT"]
+    [ring/ring-headers "0.1.0"]
 
 ## Documentation
 
