@@ -10,6 +10,10 @@ Add the following dependency to your `project.clj`:
 
     [ring/ring-headers "0.1.0-SNAPSHOT"]
 
+## Documentation
+
+* [API Docs](http://ring-clojure.github.io/ring-headers)
+
 ## License
 
 Copyright © 2014 James Reeves
