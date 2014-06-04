@@ -8,4 +8,7 @@
   :plugins [[codox "0.8.8"]]
   :codox {:project {:name "Ring-Headers"}}
   :profiles
-  {:dev {:dependencies [[ring-mock "0.1.5"]]}})
+  {:dev {:dependencies [[ring-mock "0.1.5"]]}
+   :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
+   :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
+   :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}})
