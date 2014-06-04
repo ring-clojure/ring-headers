@@ -1,13 +1,15 @@
-# ring-headers
+# Ring-Headers
 
-A Clojure library designed to ... well, that part is up to you.
+Ring middleware for adding and manipulating common response headers.
 
-## Usage
+## Installation
 
-FIXME
+Add the following dependency to your `project.clj`:
+
+    [ring/ring-headers "0.1.0-SNAPSHOT"]
 
 ## License
 
-Copyright © 2014 FIXME
+Copyright © 2014 James Reeves
 
 Distributed under the MIT License, the same as Ring.
