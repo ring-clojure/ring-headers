@@ -51,3 +51,29 @@
 
     (testing "bad arguments"
       (is (thrown? AssertionError (wrap-content-type-options handle-hello :foo))))))
+
+(deftest test-wrap-xss-protection
+  (let [handle-hello (constantly (response "hello"))]
+    (testing "enable"
+      (let [handler (wrap-xss-protection handle-hello true)
+            resp    (handler (request :get "/"))]
+        (is (= (:headers resp) {"X-XSS-Protection" "1"}))))
+
+    (testing "disable"
+      (let [handler (wrap-xss-protection handle-hello false)
+            resp    (handler (request :get "/"))]
+        (is (= (:headers resp) {"X-XSS-Protection" "0"}))))
+
+    (testing "enable with block"
+      (let [handler (constantly
+                     (-> (response "hello")
+                         (content-type "text/plain")))
+            resp    ((wrap-xss-protection handler true {:mode :block})
+                     (request :get "/"))]
+        (is (= resp {:status  200
+                     :headers {"X-XSS-Protection" "1; mode=block"
+                               "Content-Type" "text/plain"}
+                     :body    "hello"}))))
+
+    (testing "bad arguments"
+      (is (thrown? AssertionError (wrap-content-type-options handle-hello :foo))))))

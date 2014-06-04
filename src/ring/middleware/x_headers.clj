@@ -52,3 +52,21 @@
   (fn [request]
     (-> (handler request)
         (resp/header "X-Content-Type-Options" (name content-type-options)))))
+
+(defn wrap-xss-protection
+  "Middleware that adds the X-XSS-Protection header to the response. This header
+  enables a heuristic filter in browsers for detecting cross-site scripting
+  attacks. Usually on by default.
+
+  The enable? attribute determines whether the filter should be turned on.
+  Accepts one additional option:
+
+  :mode - currently accepts only :block
+
+  See: http://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx"
+  [handler enable? & [options]]
+  {:pre [(or (nil? options) (= options {:mode :block}))]}
+  (let [header-value (str (if enable? "1" "0") (if options "; mode=block"))]
+    (fn [request]
+      (-> (handler request)
+          (resp/header "X-XSS-Protection" header-value)))))
