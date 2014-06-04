@@ -1,5 +1,7 @@
 # Ring-Headers
 
+[![Build Status](https://secure.travis-ci.org/ring-clojure/ring-headers.png)](http://travis-ci.org/ring-clojure/ring-headers)
+
 Ring middleware for adding and manipulating common response headers.
 
 ## Installation
