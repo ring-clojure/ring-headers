@@ -37,3 +37,18 @@
     (fn [request]
       (-> (handler request)
           (resp/header "X-Frame-Options" header-value)))))
+
+(defn wrap-content-type-options
+  "Middleware that adds the X-Content-Type-Options header to the response. This
+  currently only accepts one option:
+
+  :nosniff - prevent resources with invalid media types being loaded as
+             stylesheets or scripts
+
+  This prevents attacks based around media type confusion. See:
+  http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx"
+  [handler content-type-options]
+  {:pre [(= content-type-options :nosniff)]}
+  (fn [request]
+    (-> (handler request)
+        (resp/header "X-Content-Type-Options" (name content-type-options)))))

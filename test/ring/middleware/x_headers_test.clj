@@ -36,3 +36,18 @@
                      :headers {"X-Frame-Options" "DENY"
                                "Content-Type" "text/plain"}
                      :body    "hello"}))))))
+
+(deftest test-wrap-content-type-options
+  (let [handle-hello (constantly
+                 (-> (response "hello")
+                     (content-type "text/plain")))]
+    (testing "nosniff"
+      (let [handler (wrap-content-type-options handle-hello :nosniff)
+            resp    (handler (request :get "/"))]
+        (is (= resp {:status  200
+                     :headers {"X-Content-Type-Options" "nosniff"
+                               "Content-Type" "text/plain"}
+                     :body    "hello"}))))
+
+    (testing "bad arguments"
+      (is (thrown? AssertionError (wrap-content-type-options handle-hello :foo))))))
