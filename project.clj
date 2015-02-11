@@ -1,4 +1,4 @@
-(defproject ring/ring-headers "0.1.1"
+(defproject ring/ring-headers "0.1.2"
   :description "Ring middleware for common response headers"
   :url "https://github.com/ring-clojure/ring-headers"
   :license {:name "The MIT License"
