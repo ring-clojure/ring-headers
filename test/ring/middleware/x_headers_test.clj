@@ -35,7 +35,11 @@
         (is (= resp {:status  200
                      :headers {"X-Frame-Options" "DENY"
                                "Content-Type" "text/plain"}
-                     :body    "hello"}))))))
+                     :body    "hello"}))))
+
+    (testing "nil response"
+      (let [handler (wrap-frame-options (constantly nil) :deny)]
+        (is (nil? (handler (request :get "/"))))))))
 
 (deftest test-wrap-content-type-options
   (let [handle-hello (constantly
@@ -50,7 +54,11 @@
                      :body    "hello"}))))
 
     (testing "bad arguments"
-      (is (thrown? AssertionError (wrap-content-type-options handle-hello :foo))))))
+      (is (thrown? AssertionError (wrap-content-type-options handle-hello :foo))))
+
+    (testing "nil response"
+      (let [handler (wrap-content-type-options (constantly nil) :nosniff)]
+        (is (nil? (handler (request :get "/"))))))))
 
 (deftest test-wrap-xss-protection
   (let [handle-hello (constantly (response "hello"))]
@@ -78,3 +86,7 @@
     (testing "bad arguments"
       (is (thrown? AssertionError
                    (wrap-xss-protection handle-hello true {:mode :blob}))))
+
+    (testing "nil response"
+      (let [handler (wrap-xss-protection (constantly nil) true)]
+        (is (nil? (handler (request :get "/"))))))))

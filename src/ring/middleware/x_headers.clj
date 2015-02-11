@@ -35,8 +35,8 @@
              (allow-from? frame-options))]}
   (let [header-value (format-frame-options frame-options)]
     (fn [request]
-      (-> (handler request)
-          (resp/header "X-Frame-Options" header-value)))))
+      (if-let [response (handler request)]
+        (resp/header response "X-Frame-Options" header-value)))))
 
 (defn wrap-content-type-options
   "Middleware that adds the X-Content-Type-Options header to the response. This
@@ -50,8 +50,8 @@
   [handler content-type-options]
   {:pre [(= content-type-options :nosniff)]}
   (fn [request]
-    (-> (handler request)
-        (resp/header "X-Content-Type-Options" (name content-type-options)))))
+    (if-let [response (handler request)]
+      (resp/header response "X-Content-Type-Options" (name content-type-options)))))
 
 (defn wrap-xss-protection
   "Middleware that adds the X-XSS-Protection header to the response. This header
@@ -68,5 +68,5 @@
   {:pre [(or (nil? options) (= options {:mode :block}))]}
   (let [header-value (str (if enable? "1" "0") (if options "; mode=block"))]
     (fn [request]
-      (-> (handler request)
-          (resp/header "X-XSS-Protection" header-value)))))
+      (if-let [response (handler request)]
+        (resp/header response "X-XSS-Protection" header-value)))))
