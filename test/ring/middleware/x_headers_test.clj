@@ -76,4 +76,5 @@
                      :body    "hello"}))))
 
     (testing "bad arguments"
-      (is (thrown? AssertionError (wrap-content-type-options handle-hello :foo))))))
+      (is (thrown? AssertionError
+                   (wrap-xss-protection handle-hello true {:mode :blob}))))
