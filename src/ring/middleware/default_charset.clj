@@ -5,7 +5,7 @@
 
 (defn- text-based-content-type? [content-type]
   (or (re-find #"text/" content-type)
-      (re-find #"application/(xml|json)" content-type)))
+      (re-find #"application/xml" content-type)))
 
 (defn- contains-charset? [content-type]
   (re-find #";\s*charset=[^;]*" content-type))
