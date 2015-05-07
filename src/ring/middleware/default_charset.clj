@@ -20,12 +20,8 @@
 
 (defn wrap-default-charset
   "Middleware that adds a charset to the content-type header of the response if
-  one was not set by the handler. Adds the specified charset or defaults to
-  utf-8 if no charset is specified."
-  {:arglists '([handler] [handler charset])}
-  ([handler]
-   (wrap-default-charset handler "utf-8"))
-  ([handler charset]
-   (fn [req]
-     (if-let [resp (handler req)]
-       (add-charset resp charset)))))
+  one was not set by the handler."
+  [handler charset]
+  (fn [req]
+    (if-let [resp (handler req)]
+      (add-charset resp charset))))
