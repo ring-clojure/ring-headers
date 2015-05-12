@@ -1,5 +1,7 @@
 (ns ring.middleware.absolute-redirects
-  "Middleware for correcting relative redirects so they adhere to the HTTP RFC."
+  "Middleware for replacing relative redirects with absolute redirects. Useful
+  for clients that do not yet implement RFC 7231 (RFC 2616 does not allow
+  relative redirects)."
   (:require [ring.util.request :as req])
   (:import  [java.net URL MalformedURLException]))
 
@@ -29,7 +31,7 @@
 (defn wrap-absolute-redirects
   "Middleware that converts redirects to relative URLs into redirects to
   absolute URLs. While many browsers can handle relative URLs in the Location
-  header, the HTTP RFC states that the Location header must contain an absolute
+  header, RFC 2616 states that the Location header must contain an absolute
   URL."
   [handler]
   (fn [request]
