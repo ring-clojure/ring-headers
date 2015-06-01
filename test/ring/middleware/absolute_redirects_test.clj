@@ -2,7 +2,7 @@
   (:use clojure.test
         ring.middleware.absolute-redirects
         [ring.mock.request :only [request]]
-        [ring.util.response :only [redirect response content-type]]))
+        [ring.util.response :only [redirect response content-type created]]))
 
 (deftest test-wrap-absolute-redirects
   (testing "relative redirects"
@@ -37,4 +37,9 @@
           resp    (handler (request :get "/"))]
       (is (= (:status resp) 302))
       (is (= (:headers resp) {"Location" "http://localhost/foo"
-                              "Content-Type" "text/plain"})))))
+                              "Content-Type" "text/plain"}))))
+  (testing "resource creation"
+    (let [handler (wrap-absolute-redirects (constantly (created "/bar/1")))
+          resp    (handler (request :post "/bar"))]
+      (is (= (:status resp) 201))
+      (is (= (:headers resp) {"Location" "http://localhost/bar/1"})))))

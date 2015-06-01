@@ -6,7 +6,7 @@
   (:import  [java.net URL MalformedURLException]))
 
 (defn- redirect? [response]
-  (#{301 302 303 307} (:status response)))
+  (#{201 301 302 303 307} (:status response)))
 
 (defn- get-header-key [response ^String header-name]
   (->> response :headers keys
