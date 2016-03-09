@@ -21,6 +21,6 @@
     (testing "with multiple proxies"
       (let [req  (-> (request :get "/")
                      (assoc :remote-addr "127.0.0.1")
-                     (header "x-forwarded-for" "1.2.3.4, 10.0.1.9, 192.168.4.98"))
+                     (header "x-forwarded-for" "10.0.1.9, 192.168.4.98, 1.2.3.4"))
             resp (handler req)]
         (is (= (:body resp) "1.2.3.4"))))))

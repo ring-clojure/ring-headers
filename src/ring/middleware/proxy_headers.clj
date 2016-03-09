@@ -4,10 +4,10 @@
 
 (defn wrap-forwarded-remote-addr
   "Middleware that changes the :remote-addr of the request map to the
-  first value present in the X-Forwarded-For header."
+  last value present in the X-Forwarded-For header."
   [handler]
   (fn [request]
     (if-let [forwarded-for (get-in request [:headers "x-forwarded-for"])]
-      (let [remote-addr (str/trim (re-find #"^[^,]*" forwarded-for))]
+      (let [remote-addr (str/trim (re-find #"[^,]*$" forwarded-for))]
         (handler (assoc request :remote-addr remote-addr)))
       (handler request))))
