@@ -5,8 +5,9 @@
             :url "http://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [ring/ring-core "1.3.2"]]
-  :plugins [[codox "0.8.11"]]
-  :codox {:project {:name "Ring-Headers"}}
+  :plugins [[lein-codox "0.9.4"]]
+  :codox {:project {:name "Ring-Headers"}
+          :output-path "codox"}
   :profiles
   {:dev {:dependencies [[ring/ring-mock "0.2.0"]]}
    :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
