@@ -33,3 +33,25 @@
           resp    (handler request)]
       (is (= (:headers resp)
              {"Content-Type" "application/gzip"})))))
+
+(deftest test-wrap-charset-cps
+  (testing "content-type header without charset present"
+    (let [handler (wrap-default-charset
+                   (fn [_ respond _] (respond (content-type {} "text/html")))
+                   "utf-16")
+          resp    (promise)
+          ex      (promise)]
+      (handler request resp ex)
+      (is (not (realized? ex)))
+      (is (= (:headers @resp) {"Content-Type" "text/html; charset=utf-16"}))))
+
+  (testing "content-type header with charset present"
+    (let [handler (wrap-default-charset
+                   (fn [_ respond _]
+                     (respond (-> {} (content-type "text/html") (charset "utf-8"))))
+                   "utf-16")
+          resp    (promise)
+          ex      (promise)]
+      (handler request resp ex)
+      (is (not (realized? ex)))
+      (is (= (:headers @resp) {"Content-Type" "text/html; charset=utf-8"})))))

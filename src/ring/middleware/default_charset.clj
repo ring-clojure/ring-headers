@@ -10,18 +10,24 @@
 (defn- contains-charset? [content-type]
   (re-find #";\s*charset=[^;]*" content-type))
 
-(defn- add-charset [resp charset]
-  (if-let [content-type (response/get-header resp "Content-Type")]
-    (if (and (text-based-content-type? content-type)
-             (not (contains-charset? content-type)))
-      (response/charset resp charset)
-      resp)
-    resp))
+(defn default-charset-response
+  "Add a default charset to a response if the response has no charset and
+  requires one. See: wrap-default-charset."
+  [response charset]
+  (if response
+    (if-let [content-type (response/get-header response "Content-Type")]
+      (if (and (text-based-content-type? content-type)
+               (not (contains-charset? content-type)))
+        (response/charset response charset)
+        response)
+      response)))
 
 (defn wrap-default-charset
   "Middleware that adds a charset to the content-type header of the response if
   one was not set by the handler."
   [handler charset]
-  (fn [req]
-    (if-let [resp (handler req)]
-      (add-charset resp charset))))
+  (fn
+    ([request]
+     (default-charset-response (handler request) charset))
+    ([request respond raise]
+     (handler request #(respond (default-charset-response % charset)) raise))))
