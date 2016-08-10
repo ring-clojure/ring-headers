@@ -43,3 +43,33 @@
           resp    (handler (request :post "/bar"))]
       (is (= (:status resp) 201))
       (is (= (:headers resp) {"Location" "http://localhost/bar/1"})))))
+
+(deftest test-wrap-absolute-redirects-cps
+  (testing "relative redirects"
+    (let [handler (wrap-absolute-redirects (fn [_ respond _] (respond (redirect "/foo"))))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (= (:status @resp) 302))
+      (is (= (:headers @resp) {"Location" "http://localhost/foo"}))))
+
+  (testing "absolute redirects"
+    (let [handler (wrap-absolute-redirects
+                   (fn [_ respond _] (respond (redirect "http://example.com"))))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (= (:status @resp) 302))
+      (is (= (:headers @resp) {"Location" "http://example.com"}))))
+
+  (testing "no redirects"
+    (let [handler (wrap-absolute-redirects (fn [_ respond _] (respond (response "hello"))))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/bar/baz.html") resp ex)
+      (is (not (realized? ex)))
+      (is (= (:status @resp) 200))
+      (is (= (:headers @resp) {}))
+      (is (= (:body @resp) "hello")))))

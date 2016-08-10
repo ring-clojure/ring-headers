@@ -28,14 +28,22 @@
     (let [url (URL. (req/request-url request))]
       (str (URL. url location)))))
 
+(defn absolute-redirects-response
+  "Convert a response that redirects to a relative URLs into a response that
+  redirects to an absolute URL. See: wrap-absolute-redirects."
+  [response request]
+  (if (redirect? response)
+    (update-header response "location" absolute-url request)
+    response))
+
 (defn wrap-absolute-redirects
   "Middleware that converts redirects to relative URLs into redirects to
   absolute URLs. While many browsers can handle relative URLs in the Location
   header, RFC 2616 states that the Location header must contain an absolute
   URL."
   [handler]
-  (fn [request]
-    (let [response (handler request)]
-      (if (redirect? response)
-        (update-header response "location" absolute-url request)
-        response))))
+  (fn
+    ([request]
+     (absolute-redirects-response (handler request) request))
+    ([request respond raise]
+     (handler request #(respond (absolute-redirects-response % request)) raise))))
