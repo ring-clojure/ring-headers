@@ -61,9 +61,7 @@
       (is (nil? @resp)))))
 
 (deftest test-wrap-content-type-options
-  (let [handle-hello (constantly
-                 (-> (response "hello")
-                     (content-type "text/plain")))]
+  (let [handle-hello (constantly (-> (response "hello") (content-type "text/plain")))]
     (testing "nosniff"
       (let [handler (wrap-content-type-options handle-hello :nosniff)
             resp    (handler (request :get "/"))]
@@ -78,6 +76,29 @@
     (testing "nil response"
       (let [handler (wrap-content-type-options (constantly nil) :nosniff)]
         (is (nil? (handler (request :get "/"))))))))
+
+(deftest test-wrap-content-type-options-cps
+  (testing "nosniff"
+    (let [handler (-> (fn [_ respond _]
+                        (respond (-> (response "hello") (content-type "text/plain"))))
+                      (wrap-content-type-options :nosniff))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (= @resp {:status  200
+                    :headers {"X-Content-Type-Options" "nosniff"
+                              "Content-Type" "text/plain"}
+                    :body    "hello"}))))
+
+  (testing "nil response"
+    (let [handler (-> (fn [_ respond _] (respond nil))
+                      (wrap-content-type-options :nosniff))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (nil? @resp)))))
 
 (deftest test-wrap-xss-protection
   (let [handle-hello (constantly (response "hello"))]

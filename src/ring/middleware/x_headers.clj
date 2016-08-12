@@ -13,13 +13,17 @@
     (str "ALLOW-FROM " (:allow-from frame-options))
     (str/upper-case (name frame-options))))
 
-(defn- add-header [response header value]
-  (some-> response (resp/header header value)))
+(defn- wrap-x-header [handler header-name header-value]
+  (fn
+    ([request]
+     (some-> (handler request) (resp/header header-name header-value)))
+    ([request respond raise]
+     (handler request #(respond (some-> % (resp/header header-name header-value))) raise))))
 
 (defn frame-options-response
   "Add the X-Frame-Options header to the response. See: wrap-frame-options."
   [response frame-options]
-  (add-header response "X-Frame-Options" (format-frame-options frame-options)))
+  (some-> response (resp/header "X-Frame-Options" (format-frame-options frame-options))))
 
 (defn wrap-frame-options
   "Middleware that adds the X-Frame-Options header to the response. This governs
@@ -41,13 +45,13 @@
   {:pre [(or (= frame-options :deny)
              (= frame-options :sameorigin)
              (allow-from? frame-options))]}
-  (let [header-name  "X-Frame-Options"
-        header-value (format-frame-options frame-options)]
-    (fn
-      ([request]
-       (add-header (handler request) header-name header-value))
-      ([request respond raise]
-       (handler request #(respond (add-header % header-name header-value)) raise)))))
+  (wrap-x-header handler "X-Frame-Options" (format-frame-options frame-options)))
+
+(defn content-type-options-response
+  "Add the X-Content-Type-Options header to the response.
+  See: wrap-content-type-options."
+  [response content-type-options]
+  (some-> response (resp/header "X-Content-Type-Options" (name content-type-options))))
 
 (defn wrap-content-type-options
   "Middleware that adds the X-Content-Type-Options header to the response. This
@@ -60,9 +64,7 @@
   http://msdn.microsoft.com/en-us/library/ie/gg622941(v=vs.85).aspx"
   [handler content-type-options]
   {:pre [(= content-type-options :nosniff)]}
-  (fn [request]
-    (if-let [response (handler request)]
-      (resp/header response "X-Content-Type-Options" (name content-type-options)))))
+  (wrap-x-header handler "X-Content-Type-Options" (name content-type-options)))
 
 (defn wrap-xss-protection
   "Middleware that adds the X-XSS-Protection header to the response. This header
