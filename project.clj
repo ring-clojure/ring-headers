@@ -8,9 +8,10 @@
   :plugins [[lein-codox "0.9.4"]]
   :codox {:project {:name "Ring-Headers"}
           :output-path "codox"}
-  :aliases {"test-all" ["with-profile" "default:+1.6:+1.7:+1.8" "test"]}
+  :aliases {"test-all" ["with-profile" "default:+1.6:+1.7:+1.8:+1.9" "test"]}
   :profiles
   {:dev {:dependencies [[ring/ring-mock "0.3.0"]]}
    :1.6 {:dependencies [[org.clojure/clojure "1.6.0"]]}
    :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
-   :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}})
+   :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
+   :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha10"]]}})
