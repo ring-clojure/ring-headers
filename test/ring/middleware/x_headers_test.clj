@@ -41,6 +41,14 @@
       (let [handler (wrap-frame-options (constantly nil) :deny)]
         (is (nil? (handler (request :get "/"))))))))
 
+(deftest test-frame-options-response
+  (testing "deny"
+    (is (= (frame-options-response (response "hello") :deny)
+           {:status 200, :headers {"X-Frame-Options" "DENY"}, :body "hello"})))
+
+  (testing "nil response"
+    (is (nil? (frame-options-response nil :deny)))))
+
 (deftest test-wrap-frame-options-cps
   (testing "deny"
     (let [handler (-> (fn [_ respond _] (respond (response "hello")))
@@ -76,6 +84,19 @@
     (testing "nil response"
       (let [handler (wrap-content-type-options (constantly nil) :nosniff)]
         (is (nil? (handler (request :get "/"))))))))
+
+(deftest test-content-type-options-response
+  (testing "nosniff"
+    (is (= (content-type-options-response
+            (-> (response "hello") (content-type "text/plain"))
+            :nosniff)
+           {:status  200
+            :headers {"X-Content-Type-Options" "nosniff"
+                      "Content-Type" "text/plain"}
+            :body    "hello"})))
+
+  (testing "nil response"
+    (is (nil? (content-type-options-response nil :nosniff)))))
 
 (deftest test-wrap-content-type-options-cps
   (testing "nosniff"
@@ -130,6 +151,14 @@
     (testing "nil response"
       (let [handler (wrap-xss-protection (constantly nil) true)]
         (is (nil? (handler (request :get "/"))))))))
+
+(deftest test-xss-protection-response
+  (testing "enable"
+    (is (= (xss-protection-response (response "hello") :deny)
+           {:status 200, :headers {"X-XSS-Protection" "1"}, :body "hello"})))
+
+  (testing "nil response"
+    (is (nil? (frame-options-response nil :deny)))))
 
 (deftest test-wrap-xss-protection-cps
   (testing "nosniff"
