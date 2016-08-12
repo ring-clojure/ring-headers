@@ -130,3 +130,22 @@
     (testing "nil response"
       (let [handler (wrap-xss-protection (constantly nil) true)]
         (is (nil? (handler (request :get "/"))))))))
+
+(deftest test-wrap-xss-protection-cps
+  (testing "nosniff"
+    (let [handler (-> (fn [_ respond _] (respond (response "hello")))
+                      (wrap-xss-protection true))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (= (:headers @resp) {"X-XSS-Protection" "1"}))))
+
+  (testing "nil response"
+    (let [handler (-> (fn [_ respond _] (respond nil))
+                      (wrap-xss-protection true))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (nil? @resp)))))

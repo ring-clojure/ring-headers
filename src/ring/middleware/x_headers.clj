@@ -13,6 +13,9 @@
     (str "ALLOW-FROM " (:allow-from frame-options))
     (str/upper-case (name frame-options))))
 
+(defn- format-xss-protection [enable? options]
+  (str (if enable? "1" "0") (if options "; mode=block")))
+
 (defn- wrap-x-header [handler header-name header-value]
   (fn
     ([request]
@@ -66,6 +69,14 @@
   {:pre [(= content-type-options :nosniff)]}
   (wrap-x-header handler "X-Content-Type-Options" (name content-type-options)))
 
+(defn xss-protection-response
+  "Add the X-XSS-Protection header to the response. See: wrap-xss-protection."
+  ([response enable?]
+   (xss-protection-response response enable? nil))
+  ([response enable? options]
+   (some-> response
+           (resp/header "X-XSS-Protection" (format-xss-protection enable? options)))))
+
 (defn wrap-xss-protection
   "Middleware that adds the X-XSS-Protection header to the response. This header
   enables a heuristic filter in browsers for detecting cross-site scripting
@@ -77,9 +88,8 @@
   :mode - currently accepts only :block
 
   See: http://msdn.microsoft.com/en-us/library/dd565647(v=vs.85).aspx"
-  [handler enable? & [options]]
-  {:pre [(or (nil? options) (= options {:mode :block}))]}
-  (let [header-value (str (if enable? "1" "0") (if options "; mode=block"))]
-    (fn [request]
-      (if-let [response (handler request)]
-        (resp/header response "X-XSS-Protection" header-value)))))
+  ([handler enable?]
+   (wrap-xss-protection handler enable? nil))
+  ([handler enable? options]
+   {:pre [(or (nil? options) (= options {:mode :block}))]}
+   (wrap-x-header handler "X-XSS-Protection" (format-xss-protection enable? options))))
