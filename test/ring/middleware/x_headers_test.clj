@@ -41,6 +41,25 @@
       (let [handler (wrap-frame-options (constantly nil) :deny)]
         (is (nil? (handler (request :get "/"))))))))
 
+(deftest test-wrap-frame-options-cps
+  (testing "deny"
+    (let [handler (-> (fn [_ respond _] (respond (response "hello")))
+                      (wrap-frame-options :deny))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (= (:headers @resp) {"X-Frame-Options" "DENY"}))))
+
+  (testing "nil response"
+    (let [handler (-> (fn [_ respond _] (respond nil))
+                      (wrap-frame-options :deny))
+          resp    (promise)
+          ex      (promise)]
+      (handler (request :get "/") resp ex)
+      (is (not (realized? ex)))
+      (is (nil? @resp)))))
+
 (deftest test-wrap-content-type-options
   (let [handle-hello (constantly
                  (-> (response "hello")

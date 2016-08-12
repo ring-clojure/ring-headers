@@ -13,6 +13,14 @@
     (str "ALLOW-FROM " (:allow-from frame-options))
     (str/upper-case (name frame-options))))
 
+(defn- add-header [response header value]
+  (some-> response (resp/header header value)))
+
+(defn frame-options-response
+  "Add the X-Frame-Options header to the response. See: wrap-frame-options."
+  [response frame-options]
+  (add-header response "X-Frame-Options" (format-frame-options frame-options)))
+
 (defn wrap-frame-options
   "Middleware that adds the X-Frame-Options header to the response. This governs
   whether your site can be rendered in a <frame>, <iframe> or <object>, and is
@@ -33,10 +41,13 @@
   {:pre [(or (= frame-options :deny)
              (= frame-options :sameorigin)
              (allow-from? frame-options))]}
-  (let [header-value (format-frame-options frame-options)]
-    (fn [request]
-      (if-let [response (handler request)]
-        (resp/header response "X-Frame-Options" header-value)))))
+  (let [header-name  "X-Frame-Options"
+        header-value (format-frame-options frame-options)]
+    (fn
+      ([request]
+       (add-header (handler request) header-name header-value))
+      ([request respond raise]
+       (handler request #(respond (add-header % header-name header-value)) raise)))))
 
 (defn wrap-content-type-options
   "Middleware that adds the X-Content-Type-Options header to the response. This
