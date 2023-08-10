@@ -38,9 +38,9 @@
 
 (defn wrap-absolute-redirects
   "Middleware that converts redirects to relative URLs into redirects to
-  absolute URLs. While many browsers can handle relative URLs in the Location
-  header, RFC 2616 states that the Location header must contain an absolute
-  URL."
+  absolute URLs. This was originally mandated by RFC 2616, but RFC 7231 and
+  RFC 9110, which since obsoleted it, explicitly describe the semantics for
+  relative URIs."
   [handler]
   (fn
     ([request]
