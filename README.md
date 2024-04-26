@@ -7,7 +7,11 @@ manipulating common response headers.
 
 ## Installation
 
-Add the following dependency to your `project.clj`:
+Add the following dependency to your `deps.edn` file:
+
+    ring/ring-headers {:mvn/version "0.3.0"}
+
+Or to your Leiningen project file:
 
     [ring/ring-headers "0.3.0"]
 
