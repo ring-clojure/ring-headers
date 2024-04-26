@@ -1,6 +1,4 @@
-# Ring-Headers
-
-[![Build Status](https://travis-ci.org/ring-clojure/ring-headers.svg?branch=master)](https://travis-ci.org/ring-clojure/ring-headers)
+# Ring-Headers [![Build Status](https://github.com/ring-clojure/ring-headers/actions/workflows/test.yml/badge.svg)](https://github.com/ring-clojure/ring-headers/actions/workflows/test.yml)
 
 Ring middleware for parsing common request headers, and for adding and
 manipulating common response headers.
