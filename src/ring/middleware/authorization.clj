@@ -16,10 +16,16 @@
           {}
           (str/split auth-params #"\s*,\s*")))
 
-(defn- parse-authorization [request]
+(defn parse-credentials
+  "Parse credentials as used in the Authorization header of an HTTP
+  request.
+
+  Note: The WWW-Authenticate header of an HTTP response contains a
+  comma-separated list of challenges, which each happen to have the same
+  structure as the single credentials in the Authorization header."
+  [credentials]
   (when-let [[auth-scheme token-or-params]
-             (some-> (get-in request [:headers "authorization"])
-                     (str/split #"\s" 2))]
+             (some-> credentials (str/split #"\s" 2))]
     (cond
       (empty? token-or-params)
       {:scheme (str/lower-case auth-scheme)}
@@ -37,7 +43,7 @@
   [request]
   (if (:authorization request)
     request
-    (assoc request :authorization (parse-authorization request))))
+    (assoc request :authorization (parse-credentials (get-in request [:headers "authorization"])))))
 
 (defn wrap-authorization
   "Parses the Authorization header in the request map, then assocs the result
